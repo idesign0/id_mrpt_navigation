@@ -85,7 +85,23 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 # Export modern CMake targets
 ament_export_targets(${PROJECT_NAME})
 
-ament_export_dependencies()
+# ci-export-marker-msgs: everything in target_link_libraries() above lands in the
+# EXPORTED target's link interface -- for a static library CMake records even PRIVATE
+# deps as $<LINK_ONLY:...> in INTERFACE_LINK_LIBRARIES -- so a consumer's
+# find_package(mrpt_msgs_bridge) must be able to resolve those imported targets.
+# marker_msgs is the only one no consumer finds on its own (it is optional here and
+# nothing else pulls it in), so mrpt_pf_localization died at configure time with
+#   mrpt_msgs_bridgeExport.cmake:61 (set_target_properties): The link interface of
+#   target "mrpt_msgs_bridge::mrpt_msgs_bridge" contains:
+#     marker_msgs::marker_msgs__rosidl_generator_c
+#   but the target was not found.
+# Guarded by the same marker_msgs_FOUND as the optional source above, so builds
+# without marker_msgs are unchanged.
+if(marker_msgs_FOUND)
+  ament_export_dependencies(marker_msgs)
+else()
+  ament_export_dependencies()
+endif()
 
 install(
   TARGETS ${PROJECT_NAME}

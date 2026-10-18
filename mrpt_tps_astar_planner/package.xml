@@ -23,6 +23,14 @@
   <depend>mrpt_msgs</depend>
   <depend>mrpt_nav_interfaces</depend>
   <depend>mrpt_path_planning</depend>
+  <!-- mpp::viz_nav_plan() / <mpp/algos/viz.h> (used unconditionally by
+       src/mrpt_tps_astar_planner_node.cpp) are installed by the
+       mrpt_path_planning_viz library, which lives INSIDE the
+       mrpt_path_planning_apps package (it is a subdirectory, not a package of
+       its own). Without this edge colcon has no ordering constraint between the
+       two and find_package(mrpt_path_planning_viz QUIET) in CMakeLists.txt can
+       silently miss it. -->
+  <depend>mrpt_path_planning_apps</depend>
   <depend>nav_msgs</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
